@@ -705,11 +705,11 @@ int main(int argc, char **argv)
 			if(do_exit) {
 				goto out;
 			} else if(r) {
-				int buff = 0;
+				char buff = 0;
 				socklen_t blen = sizeof(buff);
 				rlen = sizeof(remote);
 				r = recvfrom(s, &buff, blen, 0, (struct sockaddr *)&remote, &rlen);
-				if(ntohl(buff) == UDP_ESTABLISH)
+				if(buff == UDP_ESTABLISH)
 					break;
 			}
 		}
@@ -734,7 +734,7 @@ int main(int argc, char **argv)
 			fprintf(stderr, "\n");
 		}
 
-		r = send(s, (const char *)&dongle_info, sizeof(dongle_info), 0);
+		r = sendto(s, (const char *)&dongle_info, sizeof(dongle_info), 0, (struct sockaddr *)&remote, sizeof(remote));
 		if (sizeof(dongle_info) != r)
 			printf("failed to send dongle information\n");
 
@@ -748,8 +748,6 @@ int main(int argc, char **argv)
 
 		pthread_join(tcp_worker_thread, &status);
 		pthread_join(command_thread, &status);
-
-		closesocket(s);
 
 		printf("all threads dead..\n");
 		curelem = ll_buffers;
