@@ -98,7 +98,7 @@ void usage(void)
 		"\t[-Q quality (0: no sanity checks, 0.5: half bit, 1: one bit (default), 2: two bits)]\n"
 		"\t[-e allowed_errors (default: 5)]\n"
 		"\t[-g tuner_gain (default: automatic)]\n"
-		"\t[-p ppm_error (default: 0)]\n"
+		"\t[-p ppm_error (default: 0.0)]\n"
 		"\t[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]\n"
 		"\tfilename (a '-' dumps samples to stdout)\n"
 		"\t (omitting the filename also uses stdout)\n\n"
@@ -374,7 +374,7 @@ int main(int argc, char **argv)
 	int gain = AUTO_GAIN; /* tenths of a dB */
 	int dev_index = 0;
 	int dev_given = 0;
-	int ppm_error = 0;
+	double ppm_error = 0.0;
 	int enable_biastee = 0;
 	pthread_cond_init(&ready, NULL);
 	pthread_mutex_init(&ready_m, NULL);
@@ -391,7 +391,7 @@ int main(int argc, char **argv)
 			gain = (int)(atof(optarg) * 10);
 			break;
 		case 'p':
-			ppm_error = atoi(optarg);
+			ppm_error = (double)atof(optarg);
 			break;
 		case 'V':
 			verbose_output = 1;

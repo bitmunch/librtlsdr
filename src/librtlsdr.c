@@ -786,7 +786,7 @@ int rtlsdr_set_sample_freq_correction(rtlsdr_dev_t *dev, int ppm)
 {
 	int r = 0;
 	uint8_t tmp;
-	int16_t offs = ppm * (-1) * TWO_POW(24) / 1000000;
+	int16_t offs = ppm * (-1) * TWO_POW(24) / 10000000;
 
 	tmp = offs & 0xff;
 	r |= rtlsdr_demod_write_reg(dev, 1, 0x3f, tmp, 1);
@@ -853,7 +853,7 @@ int rtlsdr_get_xtal_freq(rtlsdr_dev_t *dev, uint32_t *rtl_freq, uint32_t *tuner_
 	if (!dev)
 		return -1;
 
-	#define APPLY_PPM_CORR(val,ppm) (((val) * (1.0 + (ppm) / 1e6)))
+	#define APPLY_PPM_CORR(val,ppm) (((val) * (1.0 + (ppm) / 1e7)))
 
 	if (rtl_freq)
 		*rtl_freq = (uint32_t) APPLY_PPM_CORR(dev->rtl_xtal, dev->corr);
@@ -1034,7 +1034,7 @@ uint32_t rtlsdr_get_center_freq(rtlsdr_dev_t *dev)
 	return dev->freq;
 }
 
-int rtlsdr_set_freq_correction(rtlsdr_dev_t *dev, int ppm)
+int rtlsdr_set_freq_correction(rtlsdr_dev_t *dev, double ppm)
 {
 	int r = 0;
 	#ifdef _ENABLE_RPC
@@ -1047,12 +1047,12 @@ int rtlsdr_set_freq_correction(rtlsdr_dev_t *dev, int ppm)
 	if (!dev)
 		return -1;
 
-	if (dev->corr == ppm)
+	if (dev->corr == (int)(ppm * 10.0f))
 		return -2;
 
-	dev->corr = ppm;
+	dev->corr = (int)(ppm * 10.0f);
 
-	r |= rtlsdr_set_sample_freq_correction(dev, ppm);
+	r |= rtlsdr_set_sample_freq_correction(dev, dev->corr);
 
 	/* read corrected clock value into e4k and r82xx structure */
 	if (rtlsdr_get_xtal_freq(dev, NULL, &dev->e4k_s.vco.fosc) ||
@@ -1065,7 +1065,7 @@ int rtlsdr_set_freq_correction(rtlsdr_dev_t *dev, int ppm)
 	return r;
 }
 
-int rtlsdr_get_freq_correction(rtlsdr_dev_t *dev)
+double rtlsdr_get_freq_correction(rtlsdr_dev_t *dev)
 {
 	#ifdef _ENABLE_RPC
 	if (rtlsdr_rpc_is_enabled())
@@ -1077,7 +1077,7 @@ int rtlsdr_get_freq_correction(rtlsdr_dev_t *dev)
 	if (!dev)
 		return 0;
 
-	return dev->corr;
+	return (dev->corr / 10.0f);
 }
 
 enum rtlsdr_tuner rtlsdr_get_tuner_type(rtlsdr_dev_t *dev)

@@ -135,7 +135,7 @@ void usage(void)
 		//"\t[-t threads (default: 1)]\n"
 		"\t[-d device_index (default: 0)]\n"
 		"\t[-g tuner_gain (default: automatic)]\n"
-		"\t[-p ppm_error (default: 0)]\n"
+		"\t[-p ppm_error (default: 0.0)]\n"
 		"\t[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]\n"
 		"\t[-D direct_sampling_mode (default: 0, 1 = I, 2 = Q, 3 = I below threshold, 4 = Q below threshold)]\n"
 		"\t[-D direct_sampling_threshold_frequency (default: 0 use tuner specific frequency threshold for 3 and 4)]\n"
@@ -770,7 +770,7 @@ int main(int argc, char **argv)
 	int gain = AUTO_GAIN; // tenths of a dB
 	int dev_index = 0;
 	int dev_given = 0;
-	int ppm_error = 0;
+	double ppm_error = 0.0;
 	int interval = 10;
 	int fft_threads = 1;
 	int smoothing = 0;
@@ -840,7 +840,7 @@ int main(int argc, char **argv)
 			fft_threads = atoi(optarg);
 			break;
 		case 'p':
-			ppm_error = atoi(optarg);
+			ppm_error = (double)atof(optarg);
 			break;
 		case '1':
 			single = 1;

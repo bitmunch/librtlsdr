@@ -246,7 +246,7 @@ int verbose_gain_set(rtlsdr_dev_t *dev, int gain)
 	return r;
 }
 
-int verbose_ppm_set(rtlsdr_dev_t *dev, int ppm_error)
+int verbose_ppm_set(rtlsdr_dev_t *dev, double ppm_error)
 {
 	int r;
 	if (ppm_error == 0) {

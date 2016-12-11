@@ -107,7 +107,7 @@ void usage(void)
 		"\t[-n max number of linked list buffers to keep (default: 500)]\n"
 		"\t[-w rtlsdr tuner bandwidth [Hz] (for R820T and E4000 tuners)]\n"
 		"\t[-d device index (default: 0)]\n"
-		"\t[-P ppm_error (default: 0)]\n"
+		"\t[-P ppm_error (default: 0.0)]\n"
 		"\t[-T enable bias-T on GPIO PIN 0 (works for rtl-sdr.com v3 dongles)]\n"
 		"\t[-D direct_sampling_mode (default: 0, 1 = I, 2 = Q, 3 = I below threshold, 4 = Q below threshold)]\n"
 		"\t[-D direct_sampling_threshold_frequency (default: 0 use tuner specific frequency threshold for 3 and 4)]\n"
@@ -341,8 +341,9 @@ static void *command_worker(void *arg)
 			rtlsdr_set_tuner_gain(dev, ntohl(cmd.param));
 			break;
 		case SET_FREQUENCY_CORRECTION:
-			printf("set freq correction %d\n", ntohl(cmd.param));
-			rtlsdr_set_freq_correction(dev, ntohl(cmd.param));
+			tmp = (int)ntohl(cmd.param);
+			printf("set freq correction %d\n", tmp);
+			rtlsdr_set_freq_correction(dev, (double)((int)tmp * 1.0f));
 			break;
 		case SET_IF_STAGE:
 			tmp = ntohl(cmd.param);
@@ -493,7 +494,7 @@ int main(int argc, char **argv)
 	int dev_index = 0;
 	int dev_given = 0;
 	int gain = 0;
-	int ppm_error = 0;
+	double ppm_error = 0.0;
 	struct llist *curelem,*prev;
 	pthread_attr_t attr;
 	void *status;
@@ -549,7 +550,7 @@ int main(int argc, char **argv)
 			llbuf_num = atoi(optarg);
 			break;
 		case 'P':
-			ppm_error = atoi(optarg);
+			ppm_error = (double)atof(optarg);
 			break;
 		case 'w':
 			bandwidth = (uint32_t)atofs(optarg);

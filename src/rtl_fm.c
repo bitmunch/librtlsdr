@@ -159,7 +159,7 @@ struct dongle_state
 	int	  gain;
 	int16_t  buf16[MAXIMUM_BUF_LENGTH];
 	uint32_t buf_len;
-	int	  ppm_error;
+	double	  ppm_error;
 	int	  offset_tuning;
 	int	  direct_sampling;
 	int	  mute;
@@ -276,7 +276,7 @@ void usage(void)
 		"\t[-c de-emphasis_time_constant in us for wbfm. 'us' or 'eu' for 75/50 us (default: us)]\n"
 		//"\t	for fm squelch is inverted\n"
 		"\t[-o oversampling (default: 1, 4 recommended)]\n"
-		"\t[-p ppm_error (default: 0)]\n"
+		"\t[-p ppm_error (default: 0.0)]\n"
 		"\t[-E enable_option (default: none)]\n"
 		"\t	use multiple -E to enable multiple options\n"
 		"\t	edge:   enable lower edge tuning\n"
@@ -1765,7 +1765,7 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 'p':
-			dongle.ppm_error = atoi(optarg);
+			dongle.ppm_error = (double)atof(optarg);
 			custom_ppm = 1;
 			break;
 		case 'E':
